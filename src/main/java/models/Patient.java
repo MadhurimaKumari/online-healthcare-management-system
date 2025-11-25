@@ -3,10 +3,7 @@ package models;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * Patient model class extending User with patient-specific attributes.
- * Represents a patient in the healthcare system with medical history and health status.
- */
+
 public class Patient extends User implements Serializable {
     private static final long serialVersionUID = 1L;
     
