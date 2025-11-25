@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 /**
  * Utility class for input validation with comprehensive checks for user data.
  * Prevents invalid data from reaching the database layer.
- * Follows encapsulation and single responsibility principles.
+ * Follows encapsulation and single responsibility principles
  */
 public class ValidationUtil {
     private static final Logger logger = Logger.getLogger(ValidationUtil.class.getName());
