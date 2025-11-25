@@ -16,7 +16,7 @@ public class PasswordUtil {
      * Each call generates a unique salt, preventing rainbow table attacks.
      * @param plainPassword The plain-text password to hash (must not be null or empty)
      * @return The hashed password string (includes salt:hash), or null if hashing fails
-     * @throws RuntimeException if password hashing fails or input is invalid
+     * @throws RuntimeException if password hashing fails or input is invalid.
      */
     public static String hashPassword(String plainPassword) {
         if (plainPassword == null || plainPassword.isEmpty()) {
