@@ -2,7 +2,7 @@
 
 ## Summary
 
-This document details all errors, exceptions, and code quality issues identified in the Online Healthcare Management System through comprehensive code review using Blackbox AI. Each issue has been analyzed, documented, and corrected. Corrected code has been uploaded to the repository.
+This document details all errors, exceptions, and code quality issues identified in the Online Healthcare Management System through comprehensive code review. Each issue has been analyzed, documented, and corrected. Corrected code has been uploaded to the repository.
 
 ---
 
