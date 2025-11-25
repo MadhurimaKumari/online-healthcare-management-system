@@ -6,11 +6,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Thread-safe Singleton class for database connection management
- * Implements double-checked locking pattern for thread safety
- * Prevents resource leaks by managing JDBC resources properly
- */
+
 public class DatabaseConnection {
     private static final Logger LOGGER = Logger.getLogger(DatabaseConnection.class.getName());
     private static volatile DatabaseConnection instance;
