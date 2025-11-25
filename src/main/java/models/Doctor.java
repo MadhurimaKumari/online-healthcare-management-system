@@ -2,11 +2,7 @@ package models;
 
 import java.io.Serializable;
 
-/**
- * Doctor model class extending User with doctor-specific attributes.
- * Represents a doctor in the healthcare system with specialization and experience.
- * Implements Serializable for potential database operations and caching.
- */
+
 public class Doctor extends User implements Serializable {
     private static final long serialVersionUID = 1L;
     
