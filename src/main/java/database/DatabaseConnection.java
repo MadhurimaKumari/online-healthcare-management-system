@@ -1,29 +1,49 @@
 package database;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+/**
+ * Singleton class to manage database connections.
+ * Implements thread-safe singleton pattern and proper encapsulation.
+ */
 public class DatabaseConnection {
     private static final Logger LOGGER = Logger.getLogger(DatabaseConnection.class.getName());
     private static volatile DatabaseConnection instance;
     private Connection connection;
-    
-    // Database configuration (ideally load from properties file)
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/healthcare_db?useSSL=false&serverTimezone=UTC";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "your_password_here"; // Change this to actual password
-    private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
-    
-    // Private constructor to prevent instantiation
+    private final Properties properties = new Properties();
+
     private DatabaseConnection() throws SQLException {
+        loadProperties();
+        initializeConnection();
+    }
+
+    private void loadProperties() {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("database.properties")) {
+            if (input == null) {
+                LOGGER.severe("Unable to find database.properties");
+                return;
+            }
+            properties.load(input);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error loading database properties", e);
+        }
+    }
+
+    private void initializeConnection() throws SQLException {
         try {
-            // Load MySQL driver
-            Class.forName(DB_DRIVER);
-            this.connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            Class.forName(properties.getProperty("db.driver", "com.mysql.cj.jdbc.Driver"));
+            this.connection = DriverManager.getConnection(
+                properties.getProperty("db.url"),
+                properties.getProperty("db.username"),
+                properties.getProperty("db.password")
+            );
             LOGGER.info("Database connection established successfully");
         } catch (ClassNotFoundException e) {
             LOGGER.log(Level.SEVERE, "MySQL JDBC Driver not found", e);
@@ -33,12 +53,7 @@ public class DatabaseConnection {
             throw e;
         }
     }
-    
-    /**
-     * Thread-safe method to get singleton instance using double-checked locking
-     * @return Singleton DatabaseConnection instance
-     * @throws SQLException if connection fails
-     */
+
     public static DatabaseConnection getInstance() throws SQLException {
         if (instance == null) {
             synchronized (DatabaseConnection.class) {
@@ -49,28 +64,18 @@ public class DatabaseConnection {
         }
         return instance;
     }
-    
-    /**
-     * Get database connection with null check and validation
-     * @return Database Connection object
-     * @throws SQLException if connection is null or closed
-     */
+
     public Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
-            LOGGER.warning("Connection is null or closed, attempting to reconnect...");
             synchronized (DatabaseConnection.class) {
                 if (connection == null || connection.isClosed()) {
-                    connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                    LOGGER.info("Reconnected to database");
+                    initializeConnection();
                 }
             }
         }
         return connection;
     }
-    
-    /**
-     * Close database connection safely
-     */
+
     public void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -81,10 +86,7 @@ public class DatabaseConnection {
             LOGGER.log(Level.SEVERE, "Error closing database connection", e);
         }
     }
-    
-    /**
-     * Clean up resources when application shuts down
-     */
+
     public void shutdown() {
         closeConnection();
         instance = null;
