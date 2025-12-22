@@ -1,4 +1,4 @@
-package com.healthcare.models;
+package models;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -17,7 +17,7 @@ public class Appointment implements Serializable {
     public Appointment() {}
     
     public Appointment(int patientId, int doctorId, LocalDateTime appointmentDateTime, 
-                       String reason, String status) {
+                      String reason, String status) {
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.appointmentDateTime = appointmentDateTime;
@@ -26,7 +26,7 @@ public class Appointment implements Serializable {
     }
     
     public Appointment(int appointmentId, int patientId, int doctorId, 
-                       LocalDateTime appointmentDateTime, String reason, String status, String notes) {
+                      LocalDateTime appointmentDateTime, String reason, String status, String notes) {
         this.appointmentId = appointmentId;
         this.patientId = patientId;
         this.doctorId = doctorId;
