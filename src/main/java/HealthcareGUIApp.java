@@ -8,20 +8,35 @@ import javafx.stage.Stage;
 import javafx.geometry.Pos;
 import database.*;
 import models.*;
+import utils.PasswordUtil;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * HealthcareGUIApp - Main JavaFX Application for Online Healthcare Management
- * Provides modern GUI interface for login and role-based dashboards
+ * Provides modern GUI interface for login and role-based dashboards.
+ * Corrected to use secure password verification and Singleton DAOs.
  */
 public class HealthcareGUIApp extends Application {
+    private static final Logger LOGGER = Logger.getLogger(HealthcareGUIApp.class.getName());
     private Stage primaryStage;
-    private UserDAO userDAO = new UserDAO();
-    private AppointmentDAO appointmentDAO = new AppointmentDAO();
-    private DoctorDAO doctorDAO = new DoctorDAO();
-    private PatientDAO patientDAO = new PatientDAO();
-    private MedicalRecordDAO medicalRecordDAO = new MedicalRecordDAO();
+    private UserDAO userDAO;
+    private AppointmentDAO appointmentDAO;
+    private DoctorDAO doctorDAO;
+    private PatientDAO patientDAO;
+    private MedicalRecordDAO medicalRecordDAO;
     private User currentUser;
+
+    @Override
+    public void init() {
+        // Initialize DAOs safely using updated constructors
+        userDAO = new UserDAO();
+        appointmentDAO = new AppointmentDAO();
+        doctorDAO = new DoctorDAO();
+        patientDAO = new PatientDAO();
+        medicalRecordDAO = new MedicalRecordDAO();
+    }
 
     @Override
     public void start(Stage stage) {
@@ -60,7 +75,6 @@ public class HealthcareGUIApp extends Application {
 
         Button loginButton = new Button("Login");
         loginButton.setPrefWidth(100);
-        loginButton.setStyle("-fx-font-size: 14; -fx-padding: 10;");
         loginButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 14; -fx-padding: 10; -fx-cursor: hand;");
 
         Label errorLabel = new Label("");
@@ -75,19 +89,25 @@ public class HealthcareGUIApp extends Application {
                 return;
             }
 
-            User user = userDAO.getUserByUsername(username);
-            if (user != null && user.getPasswordHash().equals(password)) {
-                currentUser = user;
-                showDashboard();
-            } else {
-                errorLabel.setText("Invalid credentials!");
-                passwordField.clear();
+            try {
+                User user = userDAO.getUserByUsername(username);
+                // Corrected: Use PasswordUtil.verifyPassword for secure login
+                if (user != null && PasswordUtil.verifyPassword(password, user.getPasswordHash())) {
+                    currentUser = user;
+                    showDashboard();
+                } else {
+                    errorLabel.setText("Invalid credentials!");
+                    passwordField.clear();
+                }
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, "Login error", ex);
+                errorLabel.setText("Database connection error.");
             }
         });
 
         loginBox.getChildren().addAll(loginLabel, usernameField, passwordField, loginButton, errorLabel);
-
         root.getChildren().addAll(titleLabel, new Separator(), loginBox);
+
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
     }
@@ -104,8 +124,6 @@ public class HealthcareGUIApp extends Application {
 
     private void showAdminDashboard() {
         BorderPane root = new BorderPane();
-
-        // Top Menu Bar
         MenuBar menuBar = new MenuBar();
         Menu dashboardMenu = new Menu("Dashboard");
         MenuItem logoutItem = new MenuItem("Logout");
@@ -113,12 +131,8 @@ public class HealthcareGUIApp extends Application {
         dashboardMenu.getItems().add(logoutItem);
         menuBar.getMenus().add(dashboardMenu);
 
-        // Left Sidebar
-        VBox sidebar = createSidebar(new String[]{
-            "View Users", "Manage Appointments", "System Settings", "View Reports"
-        });
+        VBox sidebar = createSidebar(new String[]{"View Users", "Manage Appointments", "System Settings", "View Reports"});
 
-        // Center Content
         VBox centerContent = new VBox(20);
         centerContent.setPadding(new Insets(20));
         centerContent.setStyle("-fx-background-color: #ecf0f1;");
@@ -154,9 +168,7 @@ public class HealthcareGUIApp extends Application {
         dashboardMenu.getItems().add(logoutItem);
         menuBar.getMenus().add(dashboardMenu);
 
-        VBox sidebar = createSidebar(new String[]{
-            "View Appointments", "View Medical Records", "Manage Schedule"
-        });
+        VBox sidebar = createSidebar(new String[]{"View Appointments", "View Medical Records", "Manage Schedule"});
 
         VBox centerContent = new VBox(20);
         centerContent.setPadding(new Insets(20));
@@ -193,9 +205,7 @@ public class HealthcareGUIApp extends Application {
         dashboardMenu.getItems().add(logoutItem);
         menuBar.getMenus().add(dashboardMenu);
 
-        VBox sidebar = createSidebar(new String[]{
-            "Book Appointment", "View Appointments", "Medical History"
-        });
+        VBox sidebar = createSidebar(new String[]{"Book Appointment", "View Appointments", "Medical History"});
 
         VBox centerContent = new VBox(20);
         centerContent.setPadding(new Insets(20));
