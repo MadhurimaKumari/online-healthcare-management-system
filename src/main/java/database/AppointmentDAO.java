@@ -6,16 +6,23 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * AppointmentDAO - Data Access Object for Appointments
- * Handles all database operations for appointments
+ * AppointmentDAO - Data Access Object for Appointments.
+ * Handles all database operations for appointments using Singleton pattern and best practices.
  */
 public class AppointmentDAO {
+    private static final Logger LOGGER = Logger.getLogger(AppointmentDAO.class.getName());
     private DatabaseConnection dbConnection;
 
     public AppointmentDAO() {
-        this.dbConnection = new DatabaseConnection();
+        try {
+            this.dbConnection = DatabaseConnection.getInstance();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Database connection initialization failed in AppointmentDAO", e);
+        }
     }
 
     /**
@@ -33,7 +40,7 @@ public class AppointmentDAO {
             stmt.setString(6, appointment.getNotes());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error creating appointment: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error creating appointment", e);
             return false;
         }
     }
@@ -46,12 +53,13 @@ public class AppointmentDAO {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return mapAppointment(rs);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapAppointment(rs);
+                }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving appointment: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error retrieving appointment: " + id, e);
         }
         return null;
     }
@@ -65,12 +73,13 @@ public class AppointmentDAO {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, patientId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                appointments.add(mapAppointment(rs));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    appointments.add(mapAppointment(rs));
+                }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving patient appointments: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error retrieving patient appointments: " + patientId, e);
         }
         return appointments;
     }
@@ -84,12 +93,13 @@ public class AppointmentDAO {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, doctorId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                appointments.add(mapAppointment(rs));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    appointments.add(mapAppointment(rs));
+                }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving doctor appointments: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error retrieving doctor appointments: " + doctorId, e);
         }
         return appointments;
     }
@@ -105,7 +115,7 @@ public class AppointmentDAO {
             stmt.setInt(2, appointmentId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error updating appointment status: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error updating appointment status: " + appointmentId, e);
             return false;
         }
     }
@@ -127,7 +137,7 @@ public class AppointmentDAO {
             stmt.setInt(1, appointmentId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error deleting appointment: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error deleting appointment: " + appointmentId, e);
             return false;
         }
     }
@@ -139,13 +149,13 @@ public class AppointmentDAO {
         List<Appointment> appointments = new ArrayList<>();
         String query = "SELECT * FROM appointments";
         try (Connection conn = dbConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 appointments.add(mapAppointment(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving all appointments: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error retrieving all appointments", e);
         }
         return appointments;
     }
