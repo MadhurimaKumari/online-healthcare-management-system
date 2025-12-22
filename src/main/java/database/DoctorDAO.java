@@ -4,15 +4,23 @@ import models.Doctor;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * DoctorDAO - Data Access Object for Doctor operations
+ * DoctorDAO - Data Access Object for Doctor operations.
+ * Implements Singleton pattern and standard logging.
  */
 public class DoctorDAO {
+    private static final Logger LOGGER = Logger.getLogger(DoctorDAO.class.getName());
     private DatabaseConnection dbConnection;
 
     public DoctorDAO() {
-        this.dbConnection = new DatabaseConnection();
+        try {
+            this.dbConnection = DatabaseConnection.getInstance();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Database connection initialization failed in DoctorDAO", e);
+        }
     }
 
     /**
@@ -23,12 +31,13 @@ public class DoctorDAO {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, doctorId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return mapDoctor(rs);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapDoctor(rs);
+                }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving doctor: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error retrieving doctor: " + doctorId, e);
         }
         return null;
     }
@@ -40,13 +49,13 @@ public class DoctorDAO {
         List<Doctor> doctors = new ArrayList<>();
         String query = "SELECT * FROM users WHERE role = 'doctor'";
         try (Connection conn = dbConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 doctors.add(mapDoctor(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving doctors: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error retrieving doctors", e);
         }
         return doctors;
     }
@@ -63,7 +72,7 @@ public class DoctorDAO {
             stmt.setInt(3, doctor.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error updating doctor: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error updating doctor: " + doctor.getId(), e);
             return false;
         }
     }
@@ -78,7 +87,7 @@ public class DoctorDAO {
             stmt.setInt(1, doctorId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error deleting doctor: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error deleting doctor: " + doctorId, e);
             return false;
         }
     }
