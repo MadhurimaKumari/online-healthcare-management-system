@@ -4,15 +4,23 @@ import models.MedicalRecord;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * MedicalRecordDAO - Data Access Object for Medical Records
+ * MedicalRecordDAO - Data Access Object for Medical Records.
+ * Implements Singleton pattern and proper exception handling.
  */
 public class MedicalRecordDAO {
+    private static final Logger LOGGER = Logger.getLogger(MedicalRecordDAO.class.getName());
     private DatabaseConnection dbConnection;
 
     public MedicalRecordDAO() {
-        this.dbConnection = new DatabaseConnection();
+        try {
+            this.dbConnection = DatabaseConnection.getInstance();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Database connection initialization failed in MedicalRecordDAO", e);
+        }
     }
 
     /**
@@ -30,7 +38,7 @@ public class MedicalRecordDAO {
             stmt.setString(6, record.getNotes());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error creating medical record: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error creating medical record", e);
             return false;
         }
     }
@@ -43,12 +51,13 @@ public class MedicalRecordDAO {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return mapMedicalRecord(rs);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapMedicalRecord(rs);
+                }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving medical record: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error retrieving medical record: " + id, e);
         }
         return null;
     }
@@ -62,12 +71,13 @@ public class MedicalRecordDAO {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, patientId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                records.add(mapMedicalRecord(rs));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    records.add(mapMedicalRecord(rs));
+                }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving patient records: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error retrieving patient records: " + patientId, e);
         }
         return records;
     }
@@ -85,7 +95,7 @@ public class MedicalRecordDAO {
             stmt.setInt(4, record.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error updating medical record: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error updating medical record: " + record.getId(), e);
             return false;
         }
     }
@@ -100,7 +110,7 @@ public class MedicalRecordDAO {
             stmt.setInt(1, recordId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error deleting medical record: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error deleting medical record: " + recordId, e);
             return false;
         }
     }
