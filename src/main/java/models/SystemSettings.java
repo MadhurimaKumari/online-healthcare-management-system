@@ -1,4 +1,4 @@
-package com.healthcare.models;
+package models;
 
 import java.io.Serializable;
 
@@ -8,21 +8,18 @@ public class SystemSettings implements Serializable {
     private int settingId;
     private String settingKey;
     private String settingValue;
-    private String description;
     
     public SystemSettings() {}
     
-    public SystemSettings(String settingKey, String settingValue, String description) {
+    public SystemSettings(String settingKey, String settingValue) {
         this.settingKey = settingKey;
         this.settingValue = settingValue;
-        this.description = description;
     }
     
-    public SystemSettings(int settingId, String settingKey, String settingValue, String description) {
+    public SystemSettings(int settingId, String settingKey, String settingValue) {
         this.settingId = settingId;
         this.settingKey = settingKey;
         this.settingValue = settingValue;
-        this.description = description;
     }
     
     // Getters and Setters
@@ -35,16 +32,12 @@ public class SystemSettings implements Serializable {
     public String getSettingValue() { return settingValue; }
     public void setSettingValue(String settingValue) { this.settingValue = settingValue; }
     
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    
     @Override
     public String toString() {
         return "SystemSettings{" +
                 "settingId=" + settingId +
                 ", settingKey='" + settingKey + '\'' +
                 ", settingValue='" + settingValue + '\'' +
-                ", description='" + description + '\'' +
                 '}';
     }
 }
