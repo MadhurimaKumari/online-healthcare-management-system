@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-The Online Healthcare Management System is a comprehensive Java application designed to manage healthcare operations efficiently. Built with Core Java, JDBC, MySQL, and JavaFX, it provides both console-based and modern GUI interfaces for managing appointments, medical records, billing, and user administration.
+The Online Healthcare Management System is a comprehensive Java application designed to manage healthcare operations efficiently. Built with Core Java, JDBC, MySQL, Servlets and JavaFX, it provides both console-based and modern GUI interfaces for managing appointments, medical records, billing, and user administration.
 
 ### Key Features:
 - ✅ **Dual Interface**: Console (CLI) and Modern GUI (JavaFX)
