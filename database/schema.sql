@@ -56,12 +56,6 @@ CREATE TABLE IF NOT EXISTS system_settings (
     setting_value TEXT NOT NULL
 );
 
--- Insert sample data with BCrypt hashes
--- Passwords are same as usernames for sample data
--- admin: $2a$12$R9h/lZssNLoY789nzS70Xunx7XnFv.zXU6l/k5yKzI0k/I1Gk6Z6e (password: admin)
--- doctor1: $2a$12$V.f.yXpXyXpXyXpXyXpXyXpXyXpXyXpXyXpXyXpXyXpXyXpXyXpXy (placeholder)
--- For testing, use the 'admin' hash for all three sample users. 
--- You can change them later using the application.
 
 INSERT INTO users (username, password_hash, role, email, phone) VALUES
 ('admin', '$2a$12$R9h/lZssNLoY789nzS70Xunx7XnFv.zXU6l/k5yKzI0k/I1Gk6Z6e', 'admin', 'admin@hospital.com', '123-456-7890'),
