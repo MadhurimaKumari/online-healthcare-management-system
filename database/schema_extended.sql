@@ -1,5 +1,3 @@
--- Extended Database Schema for Billing and Reviews
--- Run these queries to add new features to your healthcare database
 
 USE healthcare_db;
 
