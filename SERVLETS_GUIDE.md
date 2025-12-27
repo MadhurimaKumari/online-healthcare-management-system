@@ -1,6 +1,5 @@
 # Java Servlets for Online Healthcare Management System
 
-This guide provides complete servlet implementations for your hospital management system. These servlets handle HTTP requests for appointments, patients, doctors, and user authentication.
 
 ## Table of Contents
 1. [AppointmentServlet](#appointmentservlet)
@@ -283,6 +282,3 @@ GET http://localhost:8080/healthcare/appointments?action=cancel&id=1
 
 ---
 
-**Author:** Madhuri Kumar  
-**Last Updated:** December 27, 2024  
-**Project:** Online Healthcare Management System
