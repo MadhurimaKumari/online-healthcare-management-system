@@ -42,7 +42,8 @@ online-healthcare-management-system/
 ├── src/main/java/
 │   ├── database/                  # DAO Classes (7 files)
 │   ├── models/                    # Model Classes (11 files)
-│   ├── utils/                     # Utilities
+│   ├── utils/                    # Utilities
+|   ├── controller/                # Servlets
 │   ├── Main.java                  # Console Application
 │   └── HealthcareGUIApp.java      # JavaFX GUI Application
 │
@@ -166,7 +167,12 @@ See [ERROR_FIXES.md](ERROR_FIXES.md) for more solutions.
 - SQL injection prevention
 - Input validation
 - Role-based access control
-
+  
+**Web Layer – Java Servlet Integration**
+- AppointmentServlet
+- PatientServlet
+- DoctorServlet
+- UserServlet
 ---
 
 ## Future Enhancements
